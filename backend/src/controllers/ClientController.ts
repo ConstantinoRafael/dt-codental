@@ -34,6 +34,17 @@ class ClientController {
       res.status(500).send("Internal server error");
     }
   }
+
+  async deleteClient(req: Request, res: Response) {
+    try {
+      const id = Number(req.params.id);
+      await ClientService.deleteClient(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal server error");
+    }
+  }
 }
 
 export default new ClientController();

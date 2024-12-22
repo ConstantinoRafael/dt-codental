@@ -28,6 +28,10 @@ class ClientRepository {
     );
     return result.rows[0];
   }
+
+  async delete(id: number): Promise<void> {
+    await this.db.query("DELETE FROM clients WHERE id = $1", [id]);
+  }
 }
 
 export default new ClientRepository();

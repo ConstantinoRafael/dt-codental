@@ -15,6 +15,10 @@ class ClientService {
   async updateClient(id: number, client: Client): Promise<Client> {
     return await ClientRepository.update(id, client);
   }
+
+  async deleteClient(id: number): Promise<void> {
+    await ClientRepository.delete(id);
+  }
 }
 
 export default new ClientService();
