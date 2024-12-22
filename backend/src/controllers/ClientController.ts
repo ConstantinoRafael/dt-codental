@@ -11,6 +11,17 @@ class ClientController {
       res.status(500).send("Internal server error");
     }
   }
+
+  async createClient(req: Request, res: Response) {
+    try {
+      const client = req.body;
+      const newClient = await ClientService.createClient(client);
+      res.status(201).json(newClient);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal server error");
+    }
+  }
 }
 
 export default new ClientController();
