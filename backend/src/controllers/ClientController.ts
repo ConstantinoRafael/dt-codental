@@ -22,6 +22,18 @@ class ClientController {
       res.status(500).send("Internal server error");
     }
   }
+
+  async updateClient(req: Request, res: Response) {
+    try {
+      const id = Number(req.params.id);
+      const client = req.body;
+      const updatedClient = await ClientService.updateClient(id, client);
+      res.status(200).json(updatedClient);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal server error");
+    }
+  }
 }
 
 export default new ClientController();

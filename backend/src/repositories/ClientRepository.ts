@@ -18,6 +18,16 @@ class ClientRepository {
     );
     return result.rows[0];
   }
+
+  async update(id: number, client: Client): Promise<Client> {
+    const { name, address, city, state, zip, phone, cpf } = client;
+    const result = await this.db.query(
+      `UPDATE clients SET name = $1, address = $2, city = $3, state = $4, zip = $5, phone = $6, cpf = $7
+       WHERE id = $8 RETURNING *`,
+      [name, address, city, state, zip, phone, cpf, id]
+    );
+    return result.rows[0];
+  }
 }
 
 export default new ClientRepository();

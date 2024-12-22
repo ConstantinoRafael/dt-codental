@@ -11,6 +11,10 @@ class ClientService {
     const newClient = await ClientRepository.create(client);
     return newClient;
   }
+
+  async updateClient(id: number, client: Client): Promise<Client> {
+    return await ClientRepository.update(id, client);
+  }
 }
 
 export default new ClientService();
