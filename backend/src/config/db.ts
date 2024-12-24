@@ -16,6 +16,19 @@ class Database {
     }
     return Database.instance;
   }
+
+  static async testConnection(): Promise<void> {
+    const pool = Database.getInstance();
+    try {
+      const res = await pool.query("SELECT NOW()");
+      console.log("Banco de dados conectado:", res.rows[0]);
+    } catch (err) {
+      console.error("Erro ao conectar ao banco de dados:", err);
+    }
+  }
 }
 
 export default Database;
+
+// Chamada para testar a conexão (você pode chamar esse método onde for necessário no seu código)
+Database.testConnection();
