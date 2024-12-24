@@ -8,7 +8,7 @@ class AuthService {
     email: string,
     password: string
   ): Promise<{ token: string; user: Omit<User, "password"> }> {
-    const user = await UserRepository.fundUserByEmail(email);
+    const user = await UserRepository.findUserByEmail(email);
 
     if (!user) {
       throw new Error("Invalid email or password");
