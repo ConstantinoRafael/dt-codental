@@ -45,6 +45,23 @@ class ClientController {
       res.status(500).send("Internal server error");
     }
   }
+
+  async uploadCSV(req: Request, res: Response) {
+    try {
+      const file = req.file;
+      if (!file || !file.buffer) {
+        res.status(400).send("No file uploaded");
+        return;
+      }
+
+      const result = await ClientService.saveClientsFromCSV(file.buffer);
+
+      res.status(201).json("clients uploaded");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal server error");
+    }
+  }
 }
 
 export default new ClientController();

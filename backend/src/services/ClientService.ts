@@ -1,5 +1,7 @@
 import ClientRepository from "../repositories/ClientRepository";
+import { clientSchema } from "../schemas/clients-schema";
 import { Client } from "../types/Client";
+import csv from "csvtojson";
 
 class ClientService {
   async getAllClients(): Promise<Client[]> {
@@ -18,6 +20,30 @@ class ClientService {
 
   async deleteClient(id: number): Promise<void> {
     await ClientRepository.delete(id);
+  }
+
+  async saveClientsFromCSV(buffer: Buffer): Promise<void> {
+    const jsonArray = await csv().fromString(buffer.toString());
+
+    const validClients = [];
+    const errors = [];
+
+    for (const [index, clientData] of jsonArray.entries()) {
+      try {
+        const validateClient = await clientSchema.validateAsync(clientData, {
+          abortEarly: false,
+          convert: false,
+        });
+
+        validClients.push(validateClient);
+      } catch (err) {
+        errors.push({ index, error: err });
+      }
+    }
+
+    for (const client of validClients) {
+      await ClientRepository.create(client);
+    }
   }
 }
 
