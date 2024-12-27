@@ -9,22 +9,35 @@ class ClientRepository {
     return result.rows;
   }
 
-  async create(client: Client): Promise<Client> {
-    const { name, address, city, state, zip, phone, cpf } = client;
+  async getByCPF(CPF: string): Promise<Client> {
+    console.log(CPF);
     const result = await this.db.query(
-      `INSERT INTO clients (name, address, city, state, zip, phone, cpf)
+      `SELECT * FROM clients WHERE "CPF" = $1`,
+      [CPF]
+    );
+
+    console.log(result.rows[0]);
+
+    return result.rows[0];
+  }
+
+  async create(client: Client): Promise<Client> {
+    const { Nome, Endereço, Cidade, Estado, CEP, Telefone, CPF } = client;
+    console.log(CPF);
+    const result = await this.db.query(
+      `INSERT INTO clients ("Nome", "Endereço", "Cidade", "Estado", "CEP", "Telefone", "CPF")
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [name, address, city, state, zip, phone, cpf]
+      [Nome, Endereço, Cidade, Estado, CEP, Telefone, CPF]
     );
     return result.rows[0];
   }
 
   async update(id: number, client: Client): Promise<Client> {
-    const { name, address, city, state, zip, phone, cpf } = client;
+    const { Nome, Endereço, Cidade, Estado, CEP, Telefone, CPF } = client;
     const result = await this.db.query(
-      `UPDATE clients SET name = $1, address = $2, city = $3, state = $4, zip = $5, phone = $6, cpf = $7
+      `UPDATE clients SET Nome = $1, Endereço = $2, Cidade = $3, Estado = $4, CEP = $5, Telefone = $6, CPF = $7
        WHERE id = $8 RETURNING *`,
-      [name, address, city, state, zip, phone, cpf, id]
+      [Nome, Endereço, Cidade, Estado, CEP, Telefone, CPF, id]
     );
     return result.rows[0];
   }

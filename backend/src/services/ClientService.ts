@@ -25,7 +25,6 @@ class ClientService {
   async saveClientsFromCSV(buffer: Buffer): Promise<void> {
     const jsonArray = await csv().fromString(buffer.toString());
 
-    const validClients = [];
     const errors = [];
 
     for (const [index, clientData] of jsonArray.entries()) {
@@ -35,15 +34,31 @@ class ClientService {
           convert: false,
         });
 
-        validClients.push(validateClient);
-      } catch (err) {
-        errors.push({ index, error: err });
+        const cpfExists = await ClientRepository.getByCPF(validateClient.CPF);
+        if (cpfExists) {
+          errors.push({
+            row: index + 1,
+            error: `Client with CPF ${validateClient.CPF} already exists.`,
+          });
+          continue;
+        }
+
+        console.log("Creating client", validateClient);
+
+        await ClientRepository.create(validateClient);
+      } catch (validationError: any) {
+        errors.push({
+          row: index + 1,
+          error: validationError.details
+            ? validationError.details
+                .map((detail: any) => detail.message)
+                .join(", ")
+            : validationError.message || "Unknown validation error",
+        });
       }
     }
 
-    for (const client of validClients) {
-      await ClientRepository.create(client);
-    }
+    console.log(errors);
   }
 }
 
