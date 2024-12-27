@@ -2,9 +2,16 @@ import { Request, Response } from "express";
 import ClientService from "../services/ClientService";
 
 class ClientController {
-  async getAllClients(_req: Request, res: Response) {
+  async getAllClients(req: Request, res: Response) {
     try {
-      const clients = await ClientService.getAllClients();
+      const { cpf, nome, telefone } = req.query;
+      console.log(nome);
+
+      const clients = await ClientService.getAllClients(
+        cpf as string,
+        nome as string,
+        telefone as string
+      );
       res.status(200).json(clients);
     } catch (error) {
       console.error(error);

@@ -4,8 +4,31 @@ import { Client } from "../types/Client";
 class ClientRepository {
   private db = Database.getInstance();
 
-  async getAll(): Promise<Client[]> {
-    const result = await this.db.query("SELECT * FROM clients");
+  async getAll(
+    CPF?: string,
+    Nome?: string,
+    Telefone?: string
+  ): Promise<Client[]> {
+    let query = "SELECT * FROM clients WHERE 1 = 1";
+
+    const params = [];
+
+    if (CPF) {
+      query += ` AND "CPF" = $${params.length + 1}`;
+      params.push(CPF);
+    }
+
+    if (Nome) {
+      query += ` AND "Nome" ILIKE $${params.length + 1}`;
+      params.push(`%${Nome}%`);
+    }
+
+    if (Telefone) {
+      query += ` AND "Telefone" = $${params.length + 1}`;
+      params.push(Telefone);
+    }
+
+    const result = await this.db.query(query, params);
     return result.rows;
   }
 

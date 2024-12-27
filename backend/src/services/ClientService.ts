@@ -4,8 +4,12 @@ import { Client } from "../types/Client";
 import csv from "csvtojson";
 
 class ClientService {
-  async getAllClients(): Promise<Client[]> {
-    const clients = await ClientRepository.getAll();
+  async getAllClients(
+    CPF?: string,
+    Nome?: string,
+    Telefone?: string
+  ): Promise<Client[]> {
+    const clients = await ClientRepository.getAll(CPF, Nome, Telefone);
     return clients;
   }
 
