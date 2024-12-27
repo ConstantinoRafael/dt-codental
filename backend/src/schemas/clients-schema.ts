@@ -1,7 +1,49 @@
 import Joi from "joi";
 
 export const clientSchema = Joi.object({
-  Nome: Joi.string().trim().required(),
+  Nome: Joi.string()
+    .trim() // Remove espaços antes e depois
+    .custom((value, helpers) => {
+      const lowerCaseWords = [
+        "da",
+        "de",
+        "do",
+        "dos",
+        "das",
+        "e",
+        "a",
+        "o",
+        "os",
+        "as",
+        "em",
+        "para",
+        "com",
+      ];
+
+      // Divide o nome em palavras
+      const formattedName = value
+        .split(" ")
+        .map((part: any, index: any, array: any) => {
+          const lowerPart = part.toLowerCase();
+
+          // Se for uma das palavras que devem ficar em minúsculas
+          if (
+            lowerCaseWords.includes(lowerPart) &&
+            index !== 0 &&
+            index !== array.length - 1
+          ) {
+            return lowerPart; // Deixa a palavra em minúsculas, se não for a primeira ou última
+          }
+
+          // Caso contrário, coloca a primeira letra maiúscula e o restante em minúsculas
+          return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+        })
+        .join(" ");
+
+      return formattedName;
+    }, "Formatador de Nome")
+    .required(),
+
   Endereço: Joi.string().trim().required(),
   Cidade: Joi.string().trim().required(),
   Estado: Joi.string().trim().required(),
@@ -19,6 +61,7 @@ export const clientSchema = Joi.object({
       return `${digits.slice(0, 5)}-${digits.slice(5)}`;
     }, "Formatador de CEP")
     .required(),
+
   Telefone: Joi.string()
     .custom((value, helpers) => {
       const digits = value.replace(/\D/g, ""); // Remove tudo que não for número
@@ -30,6 +73,7 @@ export const clientSchema = Joi.object({
         : `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
     }, "Formatador de Telefone")
     .required(),
+
   CPF: Joi.string()
     .custom((value, helpers) => {
       const digits = value.replace(/\D/g, ""); // Remove tudo que não for número
