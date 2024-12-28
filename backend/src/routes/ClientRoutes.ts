@@ -23,5 +23,6 @@ router.get(
   "/total-clients-with-duplicated-phones",
   ClientController.getTotalClientsWithDuplicatedPhones
 );
+router.get("/total-clients-by-state", ClientController.getTotalClientsByState);
 
 export default router;

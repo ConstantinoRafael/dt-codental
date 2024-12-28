@@ -80,6 +80,10 @@ class ClientService {
   async getTotalClientsWithDuplicatedPhones(): Promise<number> {
     return await ClientRepository.getTotalClientsWithDuplicatedPhones();
   }
+
+  async getTotalClientsByState(): Promise<{ Estado: string; count: number }[]> {
+    return await ClientRepository.getTotalClientsByState();
+  }
 }
 
 export default new ClientService();

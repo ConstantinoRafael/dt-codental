@@ -99,6 +99,15 @@ class ClientRepository {
     `);
     return result.rows[0].count;
   }
+
+  async getTotalClientsByState(): Promise<{ Estado: string; count: number }[]> {
+    const result = await this.db.query(`
+      SELECT "Estado", COUNT(*) 
+      FROM clients
+      GROUP BY "Estado"
+    `);
+    return result.rows;
+  }
 }
 
 export default new ClientRepository();

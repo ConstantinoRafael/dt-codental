@@ -99,6 +99,16 @@ class ClientController {
       res.status(500).send("Internal server error");
     }
   }
+
+  async getTotalClientsByState(req: Request, res: Response) {
+    try {
+      const totalClientsByState = await ClientService.getTotalClientsByState();
+      res.status(200).json(totalClientsByState);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal server error");
+    }
+  }
 }
 
 export default new ClientController();
