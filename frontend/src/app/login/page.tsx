@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -20,8 +20,15 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { setToken } = useAuth();
+  const { token, setToken } = useAuth();
   const router = useRouter();
+
+  // Redireciona para /admin se já houver um token armazenado
+  useEffect(() => {
+    if (token) {
+      router.push("/admin");
+    }
+  }, [token, router]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,6 +48,11 @@ export default function LoginPage() {
     }
   };
 
+  // Impede a renderização do formulário se já estiver redirecionando
+  if (token) {
+    return null; // Pode exibir um loader ou retornar null enquanto redireciona
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -56,6 +68,11 @@ export default function LoginPage() {
           <Typography component="h1" variant="h5">
             Login
           </Typography>
+          {error && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
           <Box
             component="form"
             onSubmit={handleSubmit}
