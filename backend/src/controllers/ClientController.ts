@@ -4,15 +4,24 @@ import ClientService from "../services/ClientService";
 class ClientController {
   async getAllClients(req: Request, res: Response) {
     try {
-      const { cpf, nome, telefone } = req.query;
-      console.log(nome);
+      const { cpf, nome, telefone, page = 1, limit = 10 } = req.query;
 
-      const clients = await ClientService.getAllClients(
+      const pageNumber = Number(page);
+      const limitNumber = Number(limit);
+
+      const { clients, totalCount } = await ClientService.getAllClients(
         cpf as string,
         nome as string,
-        telefone as string
+        telefone as string,
+        pageNumber,
+        limitNumber
       );
-      res.status(200).json(clients);
+
+      const totalPages = Math.ceil(totalCount / limitNumber);
+
+      res
+        .status(200)
+        .json({ clients, totalPages, currentPage: pageNumber, totalCount });
     } catch (error) {
       console.error(error);
       res.status(500).send("Internal server error");

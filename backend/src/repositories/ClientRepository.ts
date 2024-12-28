@@ -1,3 +1,4 @@
+import { off } from "process";
 import Database from "../config/db";
 import { Client } from "../types/Client";
 
@@ -7,8 +8,10 @@ class ClientRepository {
   async getAll(
     CPF?: string,
     Nome?: string,
-    Telefone?: string
-  ): Promise<Client[]> {
+    Telefone?: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ clients: Client[]; totalCount: number }> {
     let query = "SELECT * FROM clients WHERE 1 = 1";
 
     const params = [];
@@ -28,8 +31,18 @@ class ClientRepository {
       params.push(Telefone);
     }
 
+    const countQuery = "SELECT COUNT(*) FROM clients WHERE 1 = 1";
+    const countParams = [...params];
+
+    const countResult = await this.db.query(countQuery, countParams);
+    const totalCount = parseInt(countResult.rows[0].count, 10);
+
+    const offset = (page - 1) * limit;
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit.toString(), offset.toString());
+
     const result = await this.db.query(query, params);
-    return result.rows;
+    return { clients: result.rows, totalCount };
   }
 
   async getByCPF(CPF: string): Promise<Client> {

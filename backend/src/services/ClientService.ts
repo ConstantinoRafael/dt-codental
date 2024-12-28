@@ -7,10 +7,18 @@ class ClientService {
   async getAllClients(
     CPF?: string,
     Nome?: string,
-    Telefone?: string
-  ): Promise<Client[]> {
-    const clients = await ClientRepository.getAll(CPF, Nome, Telefone);
-    return clients;
+    Telefone?: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ clients: Client[]; totalCount: number }> {
+    const { clients, totalCount } = await ClientRepository.getAll(
+      CPF,
+      Nome,
+      Telefone,
+      page,
+      limit
+    );
+    return { clients, totalCount };
   }
 
   async createClient(client: Client): Promise<Client> {
