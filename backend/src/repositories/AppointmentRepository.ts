@@ -18,6 +18,15 @@ class AppointmentRepository {
 
     return result.rows[0];
   }
+
+  async fyndConflicts(startDate: Date, endDate: Date): Promise<Appointment[]> {
+    const result = await this.db.query(
+      `SELECT * FROM appointments WHERE startDate < $2 AND endDate > $1`,
+      [startDate, endDate]
+    );
+
+    return result.rows;
+  }
 }
 
 export default new AppointmentRepository();
