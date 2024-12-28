@@ -12,6 +12,7 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import apiClient from "@/utils/apiClient";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const theme = createTheme();
 
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { setToken } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -32,7 +34,7 @@ export default function LoginPage() {
       });
 
       localStorage.setItem("token", response.data.token);
-
+      setToken(response.data.token);
       router.push("/admin");
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");

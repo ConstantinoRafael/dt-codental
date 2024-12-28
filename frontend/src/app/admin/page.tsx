@@ -1,15 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Button, Typography, Container, CssBaseline } from "@mui/material";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AdminPage() {
+  const { token } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!token) {
+      router.push("/login");
+    }
+  }, [token, router]);
 
   const handleNavigation = (path: string) => {
     router.push(path);
   };
+
+  if (!token) {
+    return null;
+  }
 
   return (
     <Container component="main">
