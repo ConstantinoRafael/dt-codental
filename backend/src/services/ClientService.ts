@@ -72,6 +72,10 @@ class ClientService {
 
     console.log(errors);
   }
+
+  async getTotalClients(): Promise<number> {
+    return await ClientRepository.getTotalClients();
+  }
 }
 
 export default new ClientService();

@@ -80,6 +80,11 @@ class ClientRepository {
   async delete(id: number): Promise<void> {
     await this.db.query("DELETE FROM clients WHERE id = $1", [id]);
   }
+
+  async getTotalClients(): Promise<number> {
+    const result = await this.db.query("SELECT COUNT(*) FROM clients");
+    return parseInt(result.rows[0].count, 10);
+  }
 }
 
 export default new ClientRepository();

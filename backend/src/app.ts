@@ -3,13 +3,12 @@ import clientRoutes from "./routes/ClientRoutes";
 import appointmentRoutes from "./routes/AppointmentRoutes";
 import authRoutes from "./routes/AuthRoutes";
 import userRoutes from "./routes/UserRoutes";
-import authMiddleware from "./middlewares/auth-middleware";
 
 const app = express();
 
 app.use(express.json());
-app.use("/clients", authMiddleware, clientRoutes);
-app.use("/appointments", authMiddleware, appointmentRoutes);
+app.use("/clients", clientRoutes);
+app.use("/appointments", appointmentRoutes);
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 
