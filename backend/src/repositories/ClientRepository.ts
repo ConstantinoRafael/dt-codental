@@ -85,6 +85,20 @@ class ClientRepository {
     const result = await this.db.query("SELECT COUNT(*) FROM clients");
     return parseInt(result.rows[0].count, 10);
   }
+
+  async getTotalClientsWithDuplicatedPhones(): Promise<number> {
+    const result = await this.db.query(`
+      SELECT COUNT(*) 
+      FROM clients 
+      WHERE "Telefone" IN (
+        SELECT "Telefone" 
+        FROM clients
+        GROUP BY "Telefone"
+        HAVING COUNT(*) > 1
+      )
+    `);
+    return result.rows[0].count;
+  }
 }
 
 export default new ClientRepository();

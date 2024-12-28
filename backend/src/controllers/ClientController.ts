@@ -88,6 +88,17 @@ class ClientController {
       res.status(500).send("Internal server error");
     }
   }
+
+  async getTotalClientsWithDuplicatedPhones(req: Request, res: Response) {
+    try {
+      const totalClients =
+        await ClientService.getTotalClientsWithDuplicatedPhones();
+      res.status(200).json({ totalClients });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal server error");
+    }
+  }
 }
 
 export default new ClientController();

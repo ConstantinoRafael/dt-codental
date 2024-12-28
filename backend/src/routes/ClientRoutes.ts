@@ -19,5 +19,9 @@ router.post(
 );
 
 router.get("/total-clients", ClientController.getTotalClients);
+router.get(
+  "/total-clients-with-duplicated-phones",
+  ClientController.getTotalClientsWithDuplicatedPhones
+);
 
 export default router;
