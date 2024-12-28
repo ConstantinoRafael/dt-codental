@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,42 +13,43 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-
-const clientesData = [
-  {
-    nome: "João Silva",
-    endereco: "Rua A, 123",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01001-000",
-    telefone: "(11) 99999-9999",
-    cpf: "123.456.789-00",
-  },
-  {
-    nome: "Maria Oliveira",
-    endereco: "Av. B, 456",
-    cidade: "Rio de Janeiro",
-    estado: "RJ",
-    cep: "20000-000",
-    telefone: "(21) 88888-8888",
-    cpf: "987.654.321-11",
-  },
-  {
-    nome: "Carlos Souza",
-    endereco: "Rua C, 789",
-    cidade: "Belo Horizonte",
-    estado: "MG",
-    cep: "30000-000",
-    telefone: "(31) 77777-7777",
-    cpf: "111.222.333-44",
-  },
-];
+import apiClient from "@/utils/apiClient";
 
 export default function ClientesPage() {
+  const [clients, setClients] = useState([]);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("nome");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          throw new Error("Token not found");
+        }
+
+        const response = await apiClient.get("/clients", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            page: page + 1,
+            limit: rowsPerPage,
+          },
+        });
+        console.log(response.data.clients);
+        setClients(response.data.clients);
+        setTotalCount(response.data.totalCount);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchClients();
+  }, [page, rowsPerPage]);
 
   const handleRequestSort = (property) => {
     const isAscending = orderBy === property && order === "asc";
@@ -65,7 +66,7 @@ export default function ClientesPage() {
     setPage(0);
   };
 
-  const sortedClientes = clientesData.sort((a, b) => {
+  const sortedClientes = clients.sort((a, b) => {
     if (a[orderBy] < b[orderBy]) return order === "asc" ? -1 : 1;
     if (a[orderBy] > b[orderBy]) return order === "asc" ? 1 : -1;
     return 0;
@@ -107,15 +108,15 @@ export default function ClientesPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedClientes.map((cliente, index) => (
+            {clients.map((cliente, index) => (
               <TableRow key={index}>
-                <TableCell>{cliente.nome}</TableCell>
-                <TableCell>{cliente.endereco}</TableCell>
-                <TableCell>{cliente.cidade}</TableCell>
-                <TableCell>{cliente.estado}</TableCell>
-                <TableCell>{cliente.cep}</TableCell>
-                <TableCell>{cliente.telefone}</TableCell>
-                <TableCell>{cliente.cpf}</TableCell>
+                <TableCell>{cliente.Nome}</TableCell>
+                <TableCell>{cliente.Endereço}</TableCell>
+                <TableCell>{cliente.Cidade}</TableCell>
+                <TableCell>{cliente.Estado}</TableCell>
+                <TableCell>{cliente.CEP}</TableCell>
+                <TableCell>{cliente.Telefone}</TableCell>
+                <TableCell>{cliente.CPF}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -124,7 +125,7 @@ export default function ClientesPage() {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={clientesData.length}
+        count={totalCount}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
