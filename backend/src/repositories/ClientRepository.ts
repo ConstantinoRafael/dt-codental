@@ -9,7 +9,9 @@ class ClientRepository {
     Nome?: string,
     Telefone?: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    sortBy: string = "createdAt",
+    order: string = "asc"
   ): Promise<{ clients: Client[]; totalCount: number }> {
     let query = "SELECT * FROM clients WHERE 1 = 1";
 
@@ -30,7 +32,19 @@ class ClientRepository {
       params.push(Telefone);
     }
 
-    const countQuery = "SELECT COUNT(*) FROM clients WHERE 1 = 1";
+    const validSortFields = ["Nome", "Estado", "createdAt"];
+    if (!validSortFields.includes(sortBy)) {
+      throw new Error("Invalid sortBy field");
+    }
+
+    query += ` ORDER BY "${sortBy}" ${order}`;
+
+    const countQuery = `
+    SELECT COUNT(*) FROM clients WHERE 1 = 1
+    ${CPF ? ` AND "CPF" = $${params.length + 1}` : ""}
+    ${Nome ? ` AND "Nome" ILIKE $${params.length + 1}` : ""}
+    ${Telefone ? ` AND "Telefone" = $${params.length + 1}` : ""}
+  `;
     const countParams = [...params];
 
     const countResult = await this.db.query(countQuery, countParams);

@@ -9,14 +9,18 @@ class ClientService {
     Nome?: string,
     Telefone?: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    sortBy: string = "createdAt",
+    order: string = "asc"
   ): Promise<{ clients: Client[]; totalCount: number }> {
     const { clients, totalCount } = await ClientRepository.getAll(
       CPF,
       Nome,
       Telefone,
       page,
-      limit
+      limit,
+      sortBy,
+      order
     );
     return { clients, totalCount };
   }

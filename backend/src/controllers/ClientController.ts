@@ -4,7 +4,15 @@ import ClientService from "../services/ClientService";
 class ClientController {
   async getAllClients(req: Request, res: Response) {
     try {
-      const { cpf, nome, telefone, page = 1, limit = 10 } = req.query;
+      const {
+        cpf,
+        nome,
+        telefone,
+        page = 1,
+        limit = 10,
+        sortBy = "createdAt",
+        order = "asc",
+      } = req.query;
 
       const pageNumber = Number(page);
       const limitNumber = Number(limit);
@@ -14,7 +22,9 @@ class ClientController {
         nome as string,
         telefone as string,
         pageNumber,
-        limitNumber
+        limitNumber,
+        sortBy as string,
+        order as string
       );
 
       const totalPages = Math.ceil(totalCount / limitNumber);
