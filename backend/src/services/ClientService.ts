@@ -77,16 +77,21 @@ class ClientService {
     console.log(errors);
   }
 
-  async getTotalClients(): Promise<number> {
-    return await ClientRepository.getTotalClients();
-  }
+  async getClientMetrics(): Promise<{
+    totalClients: number;
+    totalClientsWithDuplicatedPhones: number;
+    totalClientsByState: { Estado: string; count: number }[];
+  }> {
+    const totalClients = await ClientRepository.getTotalClients();
+    const totalClientsWithDuplicatedPhones =
+      await ClientRepository.getTotalClientsWithDuplicatedPhones();
+    const totalClientsByState = await ClientRepository.getTotalClientsByState();
 
-  async getTotalClientsWithDuplicatedPhones(): Promise<number> {
-    return await ClientRepository.getTotalClientsWithDuplicatedPhones();
-  }
-
-  async getTotalClientsByState(): Promise<{ Estado: string; count: number }[]> {
-    return await ClientRepository.getTotalClientsByState();
+    return {
+      totalClients,
+      totalClientsWithDuplicatedPhones,
+      totalClientsByState,
+    };
   }
 }
 

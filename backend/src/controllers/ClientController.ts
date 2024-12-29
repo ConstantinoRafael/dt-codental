@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import ClientService from "../services/ClientService";
-import socketIO from "../config/socket";
+import { getSocketIO } from "../config/socket";
 
 class ClientController {
   async getAllClients(req: Request, res: Response) {
@@ -43,6 +43,13 @@ class ClientController {
     try {
       const client = req.body;
       const newClient = await ClientService.createClient(client);
+
+      const clientMetrics = await ClientService.getClientMetrics();
+
+      const io = getSocketIO();
+
+      io.emit("client-metrics", clientMetrics);
+      console.log("Metrics emitted:", clientMetrics);
       res.status(201).json(newClient);
     } catch (error) {
       console.error(error);
@@ -81,7 +88,13 @@ class ClientController {
         return;
       }
 
-      const result = await ClientService.saveClientsFromCSV(file.buffer);
+      await ClientService.saveClientsFromCSV(file.buffer);
+
+      const clientMetrics = await ClientService.getClientMetrics();
+
+      const io = getSocketIO();
+      io.emit("client-metrics", clientMetrics);
+      console.log("Metrics emitted:", clientMetrics);
 
       res.status(201).json("clients uploaded");
     } catch (error) {
@@ -92,22 +105,14 @@ class ClientController {
 
   async getClientMetrics(req: Request, res: Response) {
     try {
-      const totalClients = await ClientService.getTotalClients();
-      const totalClientsWithDuplicatedPhones =
-        await ClientService.getTotalClientsWithDuplicatedPhones();
-      const totalClientsByState = await ClientService.getTotalClientsByState();
+      const clientMetrics = await ClientService.getClientMetrics();
 
-      socketIO.emit("client-metrics", {
-        totalClients,
-        totalClientsWithDuplicatedPhones,
-        totalClientsByState,
-      });
+      const io = getSocketIO();
 
-      res.status(200).json({
-        totalClients,
-        totalClientsWithDuplicatedPhones,
-        totalClientsByState,
-      });
+      io.emit("client-metrics", clientMetrics);
+      console.log("Metrics emitted:", clientMetrics);
+
+      res.status(200).json(clientMetrics);
     } catch (error) {
       console.error(error);
       res.status(500).send("Internal server error");
