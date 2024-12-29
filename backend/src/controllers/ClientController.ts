@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import ClientService from "../services/ClientService";
+import socketIO from "../config/socket";
 
 class ClientController {
   async getAllClients(req: Request, res: Response) {
@@ -95,6 +96,12 @@ class ClientController {
       const totalClientsWithDuplicatedPhones =
         await ClientService.getTotalClientsWithDuplicatedPhones();
       const totalClientsByState = await ClientService.getTotalClientsByState();
+
+      socketIO.emit("client-metrics", {
+        totalClients,
+        totalClientsWithDuplicatedPhones,
+        totalClientsByState,
+      });
 
       res.status(200).json({
         totalClients,
