@@ -1,27 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  TablePagination,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
+import { Add } from "@mui/icons-material";
 import apiClient from "@/utils/apiClient";
+import ClientesTable from "@/components/clients/ClientsTable";
+import ClientesPagination from "@/components/clients/ClientsPagination";
+import ClientesModal from "@/components/clients/ClientsModal";
+import { Client } from "@/types/Client";
 
-export default function ClientesPage() {
-  const [clients, setClients] = useState([]);
-  const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("Nome");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [totalCount, setTotalCount] = useState(0);
+const ClientesPage: React.FC = () => {
+  const [clients, setClients] = useState<Client[]>([]);
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [orderBy, setOrderBy] = useState<string>("Nome");
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -43,7 +38,7 @@ export default function ClientesPage() {
             order: order,
           },
         });
-        console.log(response.data.clients);
+
         setClients(response.data.clients);
         setTotalCount(response.data.totalCount);
       } catch (error) {
@@ -51,96 +46,64 @@ export default function ClientesPage() {
       }
     };
     fetchClients();
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, orderBy, order]);
 
-  const handleRequestSort = (property) => {
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleAddCliente = (newClient: Client) => {
+    setClients((prev) => [...prev, newClient]);
+    setTotalCount((prev) => prev + 1);
+    handleCloseModal();
+  };
+
+  const handleRequestSort = (property: string) => {
     const isAscending = orderBy === property && order === "asc";
     setOrder(isAscending ? "desc" : "asc");
     setOrderBy(property);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const sortedClientes = clients.sort((a, b) => {
-    if (a[orderBy] < b[orderBy]) return order === "asc" ? -1 : 1;
-    if (a[orderBy] > b[orderBy]) return order === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  const paginatedClientes = sortedClientes.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
   return (
     <Paper sx={{ padding: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Lista de Clientes
-      </Typography>
-      <a href="/admin/clientes/novo-cliente">+ Cadastrar novo Cliente</a>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {[
-                "Nome",
-                "Endereco",
-                "Cidade",
-                "Estado",
-                "CEP",
-                "Telefone",
-                "CPF",
-                "createdAt",
-              ].map((column) => (
-                <TableCell key={column}>
-                  {["Nome", "Estado", "createdAt"].includes(column) ? ( // Condição para exibir o TableSortLabel
-                    <TableSortLabel
-                      active={orderBy === column}
-                      direction={orderBy === column ? order : "asc"}
-                      onClick={() => handleRequestSort(column)}
-                    >
-                      {column.charAt(0).toUpperCase() + column.slice(1)}
-                    </TableSortLabel>
-                  ) : (
-                    column.charAt(0).toUpperCase() + column.slice(1) // Apenas o nome da coluna, sem ordenação
-                  )}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h6" gutterBottom>
+          Lista de Clientes
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Add />}
+          onClick={handleOpenModal}
+        >
+          Cadastrar Cliente
+        </Button>
+      </Box>
 
-          <TableBody>
-            {clients.map((cliente, index) => (
-              <TableRow key={index}>
-                <TableCell>{cliente.Nome}</TableCell>
-                <TableCell>{cliente.Endereço}</TableCell>
-                <TableCell>{cliente.Cidade}</TableCell>
-                <TableCell>{cliente.Estado}</TableCell>
-                <TableCell>{cliente.CEP}</TableCell>
-                <TableCell>{cliente.Telefone}</TableCell>
-                <TableCell>{cliente.CPF}</TableCell>
-                <TableCell>{cliente.createdAt}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
+      <ClientesTable
+        clients={clients}
+        order={order}
+        orderBy={orderBy}
+        onRequestSort={handleRequestSort}
+      />
+
+      <ClientesPagination
         count={totalCount}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+        onChangePage={setPage}
+        onChangeRowsPerPage={(value) => {
+          setRowsPerPage(value);
+          setPage(0);
+        }}
+      />
+
+      <ClientesModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        onAddCliente={handleAddCliente}
       />
     </Paper>
   );
-}
+};
+
+export default ClientesPage;

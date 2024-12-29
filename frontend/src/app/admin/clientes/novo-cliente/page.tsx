@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, Paper, Grid } from "@mui/material";
+import { Box, Button, TextField, Typography, Paper } from "@mui/material";
 
 export default function NovoClientePage() {
   const [formValues, setFormValues] = useState({
@@ -26,8 +26,7 @@ export default function NovoClientePage() {
     event.preventDefault();
     console.log("Cliente cadastrado:", formValues);
 
-    // Aqui você pode fazer uma requisição para sua API, como:
-    // fetch('/api/clientes', { method: 'POST', body: JSON.stringify(formValues) })
+    // Aqui você pode fazer uma requisição para sua API
   };
 
   return (
@@ -36,83 +35,76 @@ export default function NovoClientePage() {
         Cadastro de Novo Cliente
       </Typography>
       <Box component="form" onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Nome"
-              name="nome"
-              value={formValues.nome}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Endereço"
-              name="endereco"
-              value={formValues.endereco}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Cidade"
-              name="cidade"
-              value={formValues.cidade}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Estado"
-              name="estado"
-              value={formValues.estado}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="CEP"
-              name="cep"
-              value={formValues.cep}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Telefone"
-              name="telefone"
-              value={formValues.telefone}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="CPF"
-              name="cpf"
-              value={formValues.cpf}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              Cadastrar Cliente
-            </Button>
-          </Grid>
-        </Grid>
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+          <TextField
+            fullWidth
+            label="Nome"
+            name="nome"
+            value={formValues.nome}
+            onChange={handleChange}
+            required
+            sx={{ gridColumn: "span 2" }} // Ocupa duas colunas
+          />
+          <TextField
+            fullWidth
+            label="Endereço"
+            name="endereco"
+            value={formValues.endereco}
+            onChange={handleChange}
+            required
+            sx={{ gridColumn: "span 2" }}
+          />
+          <TextField
+            fullWidth
+            label="Cidade"
+            name="cidade"
+            value={formValues.cidade}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            fullWidth
+            label="Estado"
+            name="estado"
+            value={formValues.estado}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            fullWidth
+            label="CEP"
+            name="cep"
+            value={formValues.cep}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            fullWidth
+            label="Telefone"
+            name="telefone"
+            value={formValues.telefone}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            fullWidth
+            label="CPF"
+            name="cpf"
+            value={formValues.cpf}
+            onChange={handleChange}
+            required
+            sx={{ gridColumn: "span 2" }}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ gridColumn: "span 2" }}
+          >
+            Cadastrar Cliente
+          </Button>
+        </Box>
       </Box>
     </Paper>
   );
