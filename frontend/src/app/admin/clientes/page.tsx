@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, Upload } from "@mui/icons-material";
 import apiClient from "@/utils/apiClient";
 import ClientesTable from "@/components/clients/ClientsTable";
 import ClientesPagination from "@/components/clients/ClientsPagination";
 import ClientesModal from "@/components/clients/ClientsModal";
 import { Client } from "@/types/Client";
+import ClientUploadCsvModal from "@/components/clients/ClientsUploadCSVModal";
 
 const ClientesPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -17,39 +18,47 @@ const ClientesPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isCsvModalOpen, setIsCsvModalOpen] = useState<boolean>(false);
+
+  const fetchClients = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("Token not found");
+      }
+
+      const response = await apiClient.get("/clients", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          page: page + 1,
+          limit: rowsPerPage,
+          sortBy: orderBy,
+          order: order,
+        },
+      });
+
+      setClients(response.data.clients);
+      setTotalCount(response.data.totalCount);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          throw new Error("Token not found");
-        }
-
-        const response = await apiClient.get("/clients", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            page: page + 1,
-            limit: rowsPerPage,
-            sortBy: orderBy,
-            order: order,
-          },
-        });
-
-        setClients(response.data.clients);
-        setTotalCount(response.data.totalCount);
-      } catch (error) {
-        console.error(error);
-      }
-    };
     fetchClients();
   }, [page, rowsPerPage, orderBy, order]);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleOpenCsvModal = () => setIsCsvModalOpen(true);
+  const handleCloseCsvModal = () => {
+    setIsCsvModalOpen(false);
+    fetchClients(); // Atualiza os dados ao fechar o modal de CSV
+  };
 
   const handleAddCliente = (newClient: Client) => {
     setClients((prev) => [...prev, newClient]);
@@ -69,38 +78,65 @@ const ClientesPage: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           Lista de Clientes
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<Add />}
-          onClick={handleOpenModal}
-        >
-          Cadastrar Cliente
-        </Button>
+
+        <Box display="flex" gap={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<Add />}
+            onClick={handleOpenModal}
+          >
+            Cadastrar Cliente
+          </Button>
+
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<Upload />}
+            onClick={handleOpenCsvModal}
+          >
+            Upload CSV
+          </Button>
+        </Box>
       </Box>
 
-      <ClientesTable
-        clients={clients}
-        order={order}
-        orderBy={orderBy}
-        onRequestSort={handleRequestSort}
-      />
+      {clients.length === 0 ? (
+        <Box textAlign="center" mt={4}>
+          <Typography variant="h6" color="textSecondary">
+            Ainda não há clientes cadastrados.
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          <ClientesTable
+            clients={clients}
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+          />
 
-      <ClientesPagination
-        count={totalCount}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onChangePage={setPage}
-        onChangeRowsPerPage={(value) => {
-          setRowsPerPage(value);
-          setPage(0);
-        }}
-      />
+          <ClientesPagination
+            count={totalCount}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onChangePage={setPage}
+            onChangeRowsPerPage={(value) => {
+              setRowsPerPage(value);
+              setPage(0);
+            }}
+          />
+        </>
+      )}
 
       <ClientesModal
         open={isModalOpen}
         onClose={handleCloseModal}
         onAddCliente={handleAddCliente}
+      />
+
+      <ClientUploadCsvModal
+        open={isCsvModalOpen}
+        onClose={handleCloseCsvModal}
       />
     </Paper>
   );
