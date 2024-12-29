@@ -89,31 +89,18 @@ class ClientController {
     }
   }
 
-  async getTotalClients(req: Request, res: Response) {
+  async getClientMetrics(req: Request, res: Response) {
     try {
       const totalClients = await ClientService.getTotalClients();
-      res.status(200).json({ totalClients });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Internal server error");
-    }
-  }
-
-  async getTotalClientsWithDuplicatedPhones(req: Request, res: Response) {
-    try {
-      const totalClients =
+      const totalClientsWithDuplicatedPhones =
         await ClientService.getTotalClientsWithDuplicatedPhones();
-      res.status(200).json({ totalClients });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Internal server error");
-    }
-  }
-
-  async getTotalClientsByState(req: Request, res: Response) {
-    try {
       const totalClientsByState = await ClientService.getTotalClientsByState();
-      res.status(200).json(totalClientsByState);
+
+      res.status(200).json({
+        totalClients,
+        totalClientsWithDuplicatedPhones,
+        totalClientsByState,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).send("Internal server error");

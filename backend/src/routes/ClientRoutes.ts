@@ -18,11 +18,6 @@ router.post(
   ClientController.uploadCSV
 );
 
-router.get("/total-clients", ClientController.getTotalClients);
-router.get(
-  "/total-clients-with-duplicated-phones",
-  ClientController.getTotalClientsWithDuplicatedPhones
-);
-router.get("/total-clients-by-state", ClientController.getTotalClientsByState);
+router.get("/client-metrics", ClientController.getClientMetrics);
 
 export default router;
