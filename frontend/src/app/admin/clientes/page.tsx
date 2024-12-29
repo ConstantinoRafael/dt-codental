@@ -18,7 +18,7 @@ import apiClient from "@/utils/apiClient";
 export default function ClientesPage() {
   const [clients, setClients] = useState([]);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("nome");
+  const [orderBy, setOrderBy] = useState("Nome");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
@@ -39,6 +39,8 @@ export default function ClientesPage() {
           params: {
             page: page + 1,
             limit: rowsPerPage,
+            sortBy: orderBy,
+            order: order,
           },
         });
         console.log(response.data.clients);
@@ -82,31 +84,38 @@ export default function ClientesPage() {
       <Typography variant="h6" gutterBottom>
         Lista de Clientes
       </Typography>
+      <a href="/admin/clientes/novo-cliente">+ Cadastrar novo Cliente</a>
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
               {[
-                "nome",
-                "endereco",
-                "cidade",
-                "estado",
-                "cep",
-                "telefone",
-                "cpf",
+                "Nome",
+                "Endereco",
+                "Cidade",
+                "Estado",
+                "CEP",
+                "Telefone",
+                "CPF",
+                "createdAt",
               ].map((column) => (
                 <TableCell key={column}>
-                  <TableSortLabel
-                    active={orderBy === column}
-                    direction={orderBy === column ? order : "asc"}
-                    onClick={() => handleRequestSort(column)}
-                  >
-                    {column.charAt(0).toUpperCase() + column.slice(1)}
-                  </TableSortLabel>
+                  {["Nome", "Estado", "createdAt"].includes(column) ? ( // Condição para exibir o TableSortLabel
+                    <TableSortLabel
+                      active={orderBy === column}
+                      direction={orderBy === column ? order : "asc"}
+                      onClick={() => handleRequestSort(column)}
+                    >
+                      {column.charAt(0).toUpperCase() + column.slice(1)}
+                    </TableSortLabel>
+                  ) : (
+                    column.charAt(0).toUpperCase() + column.slice(1) // Apenas o nome da coluna, sem ordenação
+                  )}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {clients.map((cliente, index) => (
               <TableRow key={index}>
@@ -117,6 +126,7 @@ export default function ClientesPage() {
                 <TableCell>{cliente.CEP}</TableCell>
                 <TableCell>{cliente.Telefone}</TableCell>
                 <TableCell>{cliente.CPF}</TableCell>
+                <TableCell>{cliente.createdAt}</TableCell>
               </TableRow>
             ))}
           </TableBody>
