@@ -8,8 +8,9 @@ import ClientesTable from "@/components/clients/ClientsTable";
 import ClientesPagination from "@/components/clients/ClientsPagination";
 import ClientesModal from "@/components/clients/ClientsModal";
 import { Client } from "@/types/Client";
-import ClientUploadCsvModal from "@/components/clients/ClientsUploadCSVModal";
+
 import { useRouter } from "next/navigation"; // Importando useRouter para navegação
+import ClientUploadCsvModal from "@/components/clients/ClientsUploadCsvModal";
 
 const ClientesPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
