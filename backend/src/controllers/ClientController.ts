@@ -11,7 +11,7 @@ class ClientController {
         telefone,
         page = 1,
         limit = 10,
-        sortBy = "createdAt",
+        sortBy = "created_at",
         order = "asc",
       } = req.query;
 

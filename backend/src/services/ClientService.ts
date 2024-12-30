@@ -10,7 +10,7 @@ class ClientService {
     Telefone?: string,
     page: number = 1,
     limit: number = 10,
-    sortBy: string = "createdAt",
+    sortBy: string = "created_at",
     order: string = "asc"
   ): Promise<{ clients: Client[]; totalCount: number }> {
     const { clients, totalCount } = await ClientRepository.getAll(
