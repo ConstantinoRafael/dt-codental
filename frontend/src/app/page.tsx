@@ -40,9 +40,12 @@ const Page = () => {
 
     fetchMetrics();
 
-    const socket = io(process.env.NEXT_PUBLIC_API_BASE_URL, {
-      transports: ["websocket"],
-    });
+    const socket = io(
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000",
+      {
+        transports: ["websocket"],
+      }
+    );
 
     socket.on("client-metrics", (updatedMetrics: ClientMetrics) => {
       setMetrics(updatedMetrics);
