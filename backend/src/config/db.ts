@@ -12,6 +12,9 @@ class Database {
     if (!Database.instance) {
       Database.instance = new Pool({
         connectionString: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false,
+        },
       });
     }
     return Database.instance;
