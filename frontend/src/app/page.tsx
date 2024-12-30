@@ -28,7 +28,6 @@ const Page = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
         const response = await apiClient.get("/clients/client-metrics");
         setMetrics(response.data);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,7 +45,6 @@ const Page = () => {
     });
 
     socket.on("client-metrics", (updatedMetrics: ClientMetrics) => {
-      console.log("Metrics updated", updatedMetrics);
       setMetrics(updatedMetrics);
     });
 

@@ -51,7 +51,6 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
     };
 
     const token = localStorage.getItem("token");
-    console.log(newAppointment);
 
     try {
       const response = await apiClient.post("/appointments", newAppointment, {

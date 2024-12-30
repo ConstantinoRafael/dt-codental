@@ -17,7 +17,6 @@ interface AppointmentsTableProps {
 const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   appointments,
 }) => {
-  console.log(appointments[0]);
   return (
     <TableContainer component={Paper}>
       <Table>
