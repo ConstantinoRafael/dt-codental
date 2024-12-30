@@ -7,8 +7,9 @@ import {
   Box,
   Card,
   CardContent,
-  Stack,
+  Button,
 } from "@mui/material";
+import { useRouter } from "next/navigation"; // Para navegação
 import apiClient from "@/utils/apiClient";
 import { io } from "socket.io-client";
 
@@ -22,12 +23,12 @@ const Page = () => {
   const [metrics, setMetrics] = useState<ClientMetrics | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter(); // Para redirecionamento
 
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
         const response = await apiClient.get("/clients/client-metrics");
-
         setMetrics(response.data);
       } catch (err: any) {
         setError(err.message);
@@ -38,19 +39,31 @@ const Page = () => {
 
     fetchMetrics();
 
-    const socket = io("http://localhost:5000", {
-      transports: ["websocket"],
-    });
+    const socket = io(
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000",
+      {
+        transports: ["websocket"],
+      }
+    );
 
-    socket.on("client-metrics", (updatedMatrics: ClientMetrics) => {
-      console.log("Metrics updated", updatedMatrics);
-      setMetrics(updatedMatrics);
+    socket.on("client-metrics", (updatedMetrics: ClientMetrics) => {
+      console.log("Metrics updated", updatedMetrics);
+      setMetrics(updatedMetrics);
     });
 
     return () => {
       socket.disconnect();
     };
   }, []);
+
+  const handleButtonClick = () => {
+    const token = localStorage.getItem("token"); // Obtém o token do localStorage
+    if (token) {
+      router.push("/admin"); // Redireciona para o painel administrativo
+    } else {
+      router.push("/login"); // Redireciona para a página de login
+    }
+  };
 
   if (loading) return <Typography variant="h6">Loading...</Typography>;
   if (error)
@@ -60,32 +73,42 @@ const Page = () => {
       </Typography>
     );
 
+  // Verifica se o token existe
+  const token = localStorage.getItem("token");
+
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
-        Client Metrics
-      </Typography>
-
-      <Stack
-        direction="row"
-        spacing={4}
+      {/* Header com Título e Botão */}
+      <Box
+        display="flex"
         justifyContent="space-between"
-        flexWrap="wrap"
+        alignItems="center"
+        mb={4}
       >
-        <Box sx={{ flex: 1, minWidth: "250px" }}>
+        <Typography variant="h4" gutterBottom>
+          Métricas de Clientes
+        </Typography>
+        <Button variant="contained" color="primary" onClick={handleButtonClick}>
+          {token ? "Ir para o Painel Administrativo" : "Fazer Login"}
+        </Button>
+      </Box>
+
+      {/* Primeira linha: Total Clients e Clients with Duplicated Phones */}
+      <Box display="flex" flexWrap="wrap" gap={4} mb={4}>
+        <Box flex={1} minWidth="250px">
           <Card>
             <CardContent>
-              <Typography variant="h6">Total Clients</Typography>
+              <Typography variant="h6">Total de Clientes</Typography>
               <Typography variant="h4">{metrics?.totalClients}</Typography>
             </CardContent>
           </Card>
         </Box>
 
-        <Box sx={{ flex: 1, minWidth: "250px" }}>
+        <Box flex={1} minWidth="250px">
           <Card>
             <CardContent>
               <Typography variant="h6">
-                Clients with Duplicated Phones
+                Clientes com telefone duplicados
               </Typography>
               <Typography variant="h4">
                 {metrics?.totalClientsWithDuplicatedPhones}
@@ -93,20 +116,33 @@ const Page = () => {
             </CardContent>
           </Card>
         </Box>
+      </Box>
 
-        <Box sx={{ flex: 1, minWidth: "250px" }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Clients by State</Typography>
+      {/* Card único para Clients by State */}
+      <Box flex={1} minWidth="100%">
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Clientes por Estado
+            </Typography>
+
+            {/* Organizando os estados em múltiplas colunas */}
+            <Box
+              display="grid"
+              gridTemplateColumns="repeat(auto-fit, minmax(200px, 2fr))"
+              gap={3}
+            >
               {metrics?.totalClientsByState.map((state) => (
-                <Typography key={state.Estado}>
-                  {state.Estado}: {state.count}
-                </Typography>
+                <Box key={state.Estado}>
+                  <Typography variant="body1">
+                    {state.Estado}: {state.count}
+                  </Typography>
+                </Box>
               ))}
-            </CardContent>
-          </Card>
-        </Box>
-      </Stack>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
     </Container>
   );
 };

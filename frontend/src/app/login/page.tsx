@@ -25,6 +25,7 @@ export default function LoginPage() {
 
   // Redireciona para /admin se já houver um token armazenado
   useEffect(() => {
+    console.log(token);
     if (token) {
       router.push("/admin");
     }
