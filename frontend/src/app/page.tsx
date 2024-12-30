@@ -28,6 +28,7 @@ const Page = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
+        console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
         const response = await apiClient.get("/clients/client-metrics");
         setMetrics(response.data);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,12 +41,9 @@ const Page = () => {
 
     fetchMetrics();
 
-    const socket = io(
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000",
-      {
-        transports: ["websocket"],
-      }
-    );
+    const socket = io(process.env.NEXT_PUBLIC_API_BASE_URL, {
+      transports: ["websocket"],
+    });
 
     socket.on("client-metrics", (updatedMetrics: ClientMetrics) => {
       console.log("Metrics updated", updatedMetrics);
