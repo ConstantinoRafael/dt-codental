@@ -10,11 +10,12 @@ class Database {
 
   static getInstance(): Pool {
     if (!Database.instance) {
+      const isProduction = process.env.NODE_ENV === "production";
       Database.instance = new Pool({
         connectionString: process.env.DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: isProduction
+          ? { rejectUnauthorized: false } // Habilitar SSL em produção
+          : false, // Desabilitar SSL em desenvolvimento
       });
     }
     return Database.instance;
@@ -33,5 +34,5 @@ class Database {
 
 export default Database;
 
-// Chamada para testar a conexão (você pode chamar esse método onde for necessário no seu código)
+// Chamada para testar a conexão
 Database.testConnection();
