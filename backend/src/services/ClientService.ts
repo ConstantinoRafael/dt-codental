@@ -30,13 +30,13 @@ class ClientService {
     return newClient;
   }
 
-  async updateClient(id: number, client: Client): Promise<Client> {
-    return await ClientRepository.update(id, client);
-  }
+  // async updateClient(id: number, client: Client): Promise<Client> {
+  //   return await ClientRepository.update(id, client);
+  // }
 
-  async deleteClient(id: number): Promise<void> {
-    await ClientRepository.delete(id);
-  }
+  // async deleteClient(id: number): Promise<void> {
+  //   await ClientRepository.delete(id);
+  // }
 
   async saveClientsFromCSV(buffer: Buffer): Promise<void> {
     const jsonArray = await csv().fromString(buffer.toString());

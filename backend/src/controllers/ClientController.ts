@@ -57,28 +57,28 @@ class ClientController {
     }
   }
 
-  async updateClient(req: Request, res: Response) {
-    try {
-      const id = Number(req.params.id);
-      const client = req.body;
-      const updatedClient = await ClientService.updateClient(id, client);
-      res.status(200).json(updatedClient);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Internal server error");
-    }
-  }
+  // async updateClient(req: Request, res: Response) {
+  //   try {
+  //     const id = Number(req.params.id);
+  //     const client = req.body;
+  //     const updatedClient = await ClientService.updateClient(id, client);
+  //     res.status(200).json(updatedClient);
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).send("Internal server error");
+  //   }
+  // }
 
-  async deleteClient(req: Request, res: Response) {
-    try {
-      const id = Number(req.params.id);
-      await ClientService.deleteClient(id);
-      res.status(204).send();
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Internal server error");
-    }
-  }
+  // async deleteClient(req: Request, res: Response) {
+  //   try {
+  //     const id = Number(req.params.id);
+  //     await ClientService.deleteClient(id);
+  //     res.status(204).send();
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).send("Internal server error");
+  //   }
+  // }
 
   async uploadCSV(req: Request, res: Response) {
     try {
