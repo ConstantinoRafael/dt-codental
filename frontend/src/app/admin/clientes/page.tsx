@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
-import { Add, Upload } from "@mui/icons-material";
+import { Add, Upload, ArrowBack } from "@mui/icons-material"; // Importando a seta
 import apiClient from "@/utils/apiClient";
 import ClientesTable from "@/components/clients/ClientsTable";
 import ClientesPagination from "@/components/clients/ClientsPagination";
 import ClientesModal from "@/components/clients/ClientsModal";
 import { Client } from "@/types/Client";
 import ClientUploadCsvModal from "@/components/clients/ClientsUploadCSVModal";
+import { useRouter } from "next/navigation"; // Importando useRouter para navegação
 
 const ClientesPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -19,6 +20,8 @@ const ClientesPage: React.FC = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isCsvModalOpen, setIsCsvModalOpen] = useState<boolean>(false);
+
+  const router = useRouter(); // Para navegação
 
   const fetchClients = async () => {
     try {
@@ -72,12 +75,23 @@ const ClientesPage: React.FC = () => {
     setOrderBy(property);
   };
 
+  const handleBackClick = () => {
+    router.push("/admin"); // Redireciona para a página /admin
+  };
+
   return (
     <Paper sx={{ padding: 2 }}>
+      {/* Header com Título e Seta */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h6" gutterBottom>
-          Lista de Clientes
-        </Typography>
+        <Box display="flex" alignItems="center">
+          <ArrowBack
+            sx={{ cursor: "pointer", marginRight: 2 }}
+            onClick={handleBackClick} // Redireciona para /admin ao clicar
+          />
+          <Typography variant="h6" gutterBottom>
+            Lista de Clientes
+          </Typography>
+        </Box>
 
         <Box display="flex" gap={2}>
           <Button
