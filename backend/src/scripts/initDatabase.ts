@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
 import Database from "../config/db";
 
 // Carregar variáveis de ambiente
@@ -7,7 +8,6 @@ dotenv.config();
 // Função para criar as tabelas
 const initDatabase = async () => {
   const pool = Database.getInstance();
-
   const dbName = process.env.POSTGRES_DB;
 
   // Conectar ao banco de dados
@@ -15,12 +15,9 @@ const initDatabase = async () => {
 
   try {
     console.log(`Conectando ao banco de dados ${dbName}...`);
-
-    // Passo 1: Conectar no banco de dados especificado
-    // Não é necessário usar SET search_path aqui
     console.log("Conexão estabelecida com sucesso!");
 
-    // Passo 2: Criar as tabelas no banco de dados
+    // Passo 1: Criar as tabelas no banco de dados
     const createTablesQuery = `
       CREATE TABLE IF NOT EXISTS public.clients (
           id SERIAL PRIMARY KEY,
@@ -52,8 +49,23 @@ const initDatabase = async () => {
     console.log("Criando tabelas...");
     await client.query(createTablesQuery);
     console.log("Tabelas criadas com sucesso!");
+
+    // Passo 2: Criar um usuário inicial
+    const email = "admin@codental.com";
+    const plainPassword = "admin123";
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+    const insertUserQuery = `
+      INSERT INTO public.users (email, password)
+      VALUES ($1, $2)
+      ON CONFLICT (email) DO NOTHING;
+    `;
+
+    console.log("Criando usuário inicial...");
+    await client.query(insertUserQuery, [email, hashedPassword]);
+    console.log(`Usuário inicial criado com email: ${email}`);
   } catch (err) {
-    console.error("Erro ao criar tabelas:", err);
+    console.error("Erro ao inicializar o banco de dados:", err);
   } finally {
     console.log("Liberando a conexão...");
     client.release();
