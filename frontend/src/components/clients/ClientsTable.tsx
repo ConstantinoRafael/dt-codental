@@ -24,14 +24,14 @@ const ClientesTable: React.FC<ClientesTableProps> = ({
   onRequestSort,
 }) => {
   const columns = [
-    "Nome",
-    "Endereco",
-    "Cidade",
-    "Estado",
-    "CEP",
-    "Telefone",
-    "CPF",
-    "createdAt",
+    { label: "Nome", value: "name" },
+    { label: "Endereco", value: "address" },
+    { label: "Cidade", value: "city" },
+    { label: "Estado", value: "state" },
+    { label: "CEP", value: "zip" },
+    { label: "Telefone", value: "phone" },
+    { label: "CPF", value: "cpf" },
+    { label: "Data de Criação", value: "created_at" },
   ];
 
   return (
@@ -40,17 +40,17 @@ const ClientesTable: React.FC<ClientesTableProps> = ({
         <TableHead>
           <TableRow>
             {columns.map((column) => (
-              <TableCell key={column}>
-                {["Nome", "Estado", "createdAt"].includes(column) ? (
+              <TableCell key={column.value}>
+                {["name", "state", "created_at"].includes(column.value) ? (
                   <TableSortLabel
-                    active={orderBy === column}
-                    direction={orderBy === column ? order : "asc"}
-                    onClick={() => onRequestSort(column)}
+                    active={orderBy === column.value}
+                    direction={orderBy === column.value ? order : "asc"}
+                    onClick={() => onRequestSort(column.value)}
                   >
-                    {column.charAt(0).toUpperCase() + column.slice(1)}
+                    {column.label}
                   </TableSortLabel>
                 ) : (
-                  column.charAt(0).toUpperCase() + column.slice(1)
+                  column.label
                 )}
               </TableCell>
             ))}
@@ -59,14 +59,14 @@ const ClientesTable: React.FC<ClientesTableProps> = ({
         <TableBody>
           {clients.map((cliente, index) => (
             <TableRow key={index}>
-              <TableCell>{cliente.Nome}</TableCell>
-              <TableCell>{cliente.Endereço}</TableCell>
-              <TableCell>{cliente.Cidade}</TableCell>
-              <TableCell>{cliente.Estado}</TableCell>
-              <TableCell>{cliente.CEP}</TableCell>
-              <TableCell>{cliente.Telefone}</TableCell>
-              <TableCell>{cliente.CPF}</TableCell>
-              <TableCell>{cliente.createdAt}</TableCell>
+              <TableCell>{cliente.name}</TableCell>
+              <TableCell>{cliente.address}</TableCell>
+              <TableCell>{cliente.city}</TableCell>
+              <TableCell>{cliente.state}</TableCell>
+              <TableCell>{cliente.zip}</TableCell>
+              <TableCell>{cliente.phone}</TableCell>
+              <TableCell>{cliente.cpf}</TableCell>
+              <TableCell>{cliente.created_at}</TableCell>
             </TableRow>
           ))}
         </TableBody>

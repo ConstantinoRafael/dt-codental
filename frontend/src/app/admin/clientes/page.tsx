@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation"; // Importando useRouter para navega
 const ClientesPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<string>("Nome");
+  const [orderBy, setOrderBy] = useState<string>("name");
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [totalCount, setTotalCount] = useState<number>(0);

@@ -1,10 +1,11 @@
 export interface Client {
-  Nome: string;
-  Endereço: string;
-  Cidade: string;
-  Estado: string;
-  CEP: string;
-  Telefone: string;
-  CPF: string;
-  createdAt?: string;
+  id?: number;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone: string;
+  cpf: string;
+  created_at?: string;
 }
