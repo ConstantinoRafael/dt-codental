@@ -11,8 +11,9 @@ class AppointmentRepository {
 
   async create(appointment: Appointment): Promise<Appointment> {
     const { name, startDate, endDate } = appointment;
+    console.log(appointment);
     const result = await this.db.query(
-      `INSERT INTO appointments (name, startDate, endDate) VALUES ($1, $2, $3) RETURNING *`,
+      `INSERT INTO appointments (name, "startDate", "endDate") VALUES ($1, $2, $3) RETURNING *`,
       [name, startDate, endDate]
     );
 
@@ -21,9 +22,11 @@ class AppointmentRepository {
 
   async fyndConflicts(startDate: Date, endDate: Date): Promise<Appointment[]> {
     const result = await this.db.query(
-      `SELECT * FROM appointments WHERE startDate < $2 AND endDate > $1`,
+      `SELECT * FROM appointments WHERE "startDate" < $2 AND "endDate" > $1`,
       [startDate, endDate]
     );
+
+    console.log(result);
 
     return result.rows;
   }

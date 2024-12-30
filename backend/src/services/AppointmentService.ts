@@ -16,6 +16,7 @@ class AppointmentService {
       startDate,
       endDate
     );
+
     if (conflicts.length > 0) {
       throw new Error(
         "The appointment conflicts with another scheduled appointment."
