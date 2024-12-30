@@ -28,6 +28,7 @@ const validationSchema = yup
   .required();
 
 interface NovoClienteFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit: (newClient: any) => void;
   onCancel: () => void;
 }
@@ -46,6 +47,7 @@ const NovoClienteForm: React.FC<NovoClienteFormProps> = ({
   });
 
   /// Função de submissão do formulário
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmitForm = async (data: any) => {
     const newClient = {
       Nome: data.nome,

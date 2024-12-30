@@ -25,6 +25,7 @@ const validationSchema = yup
   .required();
 
 interface NewAppointmentFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit: (newAppointment: any) => void;
   onCancel: () => void;
 }
@@ -41,6 +42,7 @@ const NewAppointmentForm: React.FC<NewAppointmentFormProps> = ({
     resolver: yupResolver(validationSchema),
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmitForm = async (data: any) => {
     const newAppointment = {
       name: data.nome,

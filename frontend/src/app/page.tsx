@@ -16,7 +16,7 @@ import { io } from "socket.io-client";
 type ClientMetrics = {
   totalClients: number;
   totalClientsWithDuplicatedPhones: number;
-  totalClientsByState: { Estado: string; count: number }[];
+  totalClientsByState: { state: string; count: number }[];
 };
 
 const Page = () => {
@@ -30,6 +30,7 @@ const Page = () => {
       try {
         const response = await apiClient.get("/clients/client-metrics");
         setMetrics(response.data);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -133,9 +134,9 @@ const Page = () => {
               gap={3}
             >
               {metrics?.totalClientsByState.map((state) => (
-                <Box key={state.Estado}>
+                <Box key={state.state}>
                   <Typography variant="body1">
-                    {state.Estado}: {state.count}
+                    {state.state}: {state.count}
                   </Typography>
                 </Box>
               ))}

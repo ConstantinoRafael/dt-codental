@@ -44,6 +44,7 @@ export default function LoginPage() {
       localStorage.setItem("token", response.data.token);
       setToken(response.data.token);
       router.push("/admin");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
     }
