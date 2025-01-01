@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import ClientService from "../services/ClientService";
 import { getSocketIO } from "../config/socket";
+import { clientsQueue } from "../queues";
 
 class ClientController {
   async getAllClients(req: Request, res: Response) {
@@ -84,19 +85,26 @@ class ClientController {
     try {
       const file = req.file;
       if (!file || !file.buffer) {
-        res.status(400).send("No file uploaded");
-        return;
+        return res.status(400).send("No file uploaded");
       }
 
-      await ClientService.saveClientsFromCSV(file.buffer);
+      // Adiciona um job na fila
+      // O nome do job (segundo parâmetro) pode ser 'processCsv'
+      await clientsQueue.add(
+        "processCsv",
+        { fileBuffer: file.buffer },
+        {
+          // Configurações do job:
+          removeOnComplete: true, // remover job do Redis quando finaliza
+          removeOnFail: false, // se quiser manter falhas para debug
+          attempts: 3, // tentativas em caso de falha
+        }
+      );
 
-      const clientMetrics = await ClientService.getClientMetrics();
-
-      const io = getSocketIO();
-      io.emit("client-metrics", clientMetrics);
-      console.log("Metrics emitted:", clientMetrics);
-
-      res.status(201).json("clients uploaded");
+      // Retorna imediatamente, dizendo que o upload foi aceito
+      res
+        .status(201)
+        .json("CSV recebido e enviado para processamento assíncrono");
     } catch (error) {
       console.error(error);
       res.status(500).send("Internal server error");
