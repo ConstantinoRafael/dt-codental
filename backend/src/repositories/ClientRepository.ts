@@ -13,49 +13,59 @@ class ClientRepository {
     sortBy: string = "created_at",
     order: string = "asc"
   ): Promise<{ clients: Client[]; totalCount: number }> {
-    let query = "SELECT * FROM clients WHERE 1 = 1";
+    // Query base
+    let query = `SELECT * FROM clients WHERE 1=1`;
+    let countQuery = `SELECT COUNT(*) FROM clients WHERE 1=1`;
 
-    const params = [];
+    const params: any[] = [];
+    const countParams: any[] = [];
 
+    // -- CPF --
     if (CPF) {
       query += ` AND cpf = $${params.length + 1}`;
       params.push(CPF);
+
+      countQuery += ` AND cpf = $${countParams.length + 1}`;
+      countParams.push(CPF);
     }
 
+    // -- Nome --
     if (Nome) {
       query += ` AND name ILIKE $${params.length + 1}`;
       params.push(`%${Nome}%`);
+
+      countQuery += ` AND name ILIKE $${countParams.length + 1}`;
+      countParams.push(`%${Nome}%`);
     }
 
+    // -- Telefone --
     if (Telefone) {
       query += ` AND phone = $${params.length + 1}`;
       params.push(Telefone);
+
+      countQuery += ` AND phone = $${countParams.length + 1}`;
+      countParams.push(Telefone);
     }
 
+    // Ordenação
     const validSortFields = ["name", "state", "created_at"];
-    console.log(sortBy);
     if (!validSortFields.includes(sortBy)) {
       throw new Error("Invalid sortBy field");
     }
-
     query += ` ORDER BY "${sortBy}" ${order}`;
 
-    const countQuery = `
-    SELECT COUNT(*) FROM clients WHERE 1 = 1
-    ${CPF ? ` AND cpf = $${params.length + 1}` : ""}
-    ${Nome ? ` AND name ILIKE $${params.length + 1}` : ""}
-    ${Telefone ? ` AND phone = $${params.length + 1}` : ""}
-  `;
-    const countParams = [...params];
-
+    // Executa countQuery
     const countResult = await this.db.query(countQuery, countParams);
     const totalCount = parseInt(countResult.rows[0].count, 10);
 
+    // Paginação
     const offset = (page - 1) * limit;
     query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-    params.push(limit.toString(), offset.toString());
+    params.push(limit, offset);
 
+    // Executa query principal
     const result = await this.db.query(query, params);
+
     return { clients: result.rows, totalCount };
   }
 

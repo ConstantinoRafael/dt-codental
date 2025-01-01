@@ -16,6 +16,7 @@ class ClientController {
         order = "asc",
       } = req.query;
 
+      console.log(req.query);
       const pageNumber = Number(page);
       const limitNumber = Number(limit);
 
