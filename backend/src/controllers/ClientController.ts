@@ -93,7 +93,7 @@ class ClientController {
       // O nome do job (segundo parâmetro) pode ser 'processCsv'
       await clientsQueue.add(
         "processCsv",
-        { fileBuffer: file.buffer },
+        { fileBuffer: file?.buffer },
         {
           // Configurações do job:
           removeOnComplete: true, // remover job do Redis quando finaliza
