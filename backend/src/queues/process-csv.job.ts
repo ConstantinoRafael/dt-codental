@@ -1,44 +1,41 @@
 import csv from "csvtojson";
 import { clientSchema } from "../schemas/clients-schema";
 import ClientRepository from "../repositories/ClientRepository";
+import ClientService from "../services/ClientService";
+import { getSocketIO } from "../config/socket";
 
-// Tipagem auxiliar para lidar com o buffer serializado
 type SerializedBuffer = {
   type: "Buffer";
   data: number[];
 };
 
-// Caso queira tipar mais genericamente, podemos dizer que data.fileBuffer
-// pode ser tanto um Buffer "de verdade" quanto o objeto serializado.
 type FileData = {
   fileBuffer: Buffer | SerializedBuffer;
 };
 
 export async function processCsvJob(data: FileData) {
   try {
-    // Se chegar como { type: 'Buffer', data: [] }, convertemos de volta para um Buffer real.
     let rawBuffer: Buffer;
     if (data.fileBuffer instanceof Buffer) {
       rawBuffer = data.fileBuffer;
+    } else if ("data" in data.fileBuffer) {
+      rawBuffer = Buffer.from(data.fileBuffer.data);
     } else {
-      if ("data" in data.fileBuffer) {
-        rawBuffer = Buffer.from(data.fileBuffer.data);
-      } else {
-        throw new Error("Invalid fileBuffer format");
-      }
+      throw new Error("Invalid fileBuffer format");
     }
 
-    // Converte o Buffer para string, para ser lido pelo csvtojson
     const csvString = rawBuffer.toString("utf8");
-
-    // Faz o parse do CSV para JSON
     const jsonArray = await csv().fromString(csvString);
+
+    const total = jsonArray.length;
+    const BATCH_SIZE = 100; // ajuste conforme necessidade
 
     const errors: any[] = [];
 
-    for (const [index, clientData] of jsonArray.entries()) {
+    for (let i = 0; i < total; i++) {
+      const clientData = jsonArray[i];
+
       try {
-        // Validação
         const validateClient = await clientSchema.validateAsync(clientData, {
           abortEarly: false,
           convert: false,
@@ -48,19 +45,17 @@ export async function processCsvJob(data: FileData) {
         const cpfExists = await ClientRepository.getByCPF(validateClient.CPF);
         if (cpfExists) {
           errors.push({
-            row: index + 1,
+            row: i + 1,
             error: `Client with CPF ${validateClient.CPF} already exists.`,
           });
           continue;
         }
 
         console.log("Creating client:", validateClient);
-
-        // Cria no repositório
         await ClientRepository.create(validateClient);
       } catch (validationError: any) {
         errors.push({
-          row: index + 1,
+          row: i + 1,
           error: validationError.details
             ? validationError.details
                 .map((detail: any) => detail.message)
@@ -68,11 +63,45 @@ export async function processCsvJob(data: FileData) {
             : validationError.message || "Unknown validation error",
         });
       }
+
+      // --- Emissão de progresso a cada BATCH_SIZE registros
+      if ((i + 1) % BATCH_SIZE === 0) {
+        const io = getSocketIO();
+        const progress = Math.round(((i + 1) / total) * 100);
+
+        io.emit("csv-progress", {
+          processed: i + 1,
+          total,
+          progress, // em %
+        });
+
+        console.log(
+          `Emitted partial progress: ${i + 1} / ${total} (${progress}%)`
+        );
+      }
     }
+
+    // Se ainda não tiver batido exato no batch, podemos emitir ao final
+    const io = getSocketIO();
+    const finalProgress = 100;
+    io.emit("csv-progress", {
+      processed: total,
+      total,
+      progress: finalProgress,
+    });
+    console.log(`Emitted final progress: ${total} / ${total} (100%)`);
 
     if (errors.length) {
       console.log("Erros encontrados durante o processamento do CSV:", errors);
-      // Você pode salvar esses erros em algum lugar, retornar em outro job, etc.
+    }
+
+    // Emitir métricas finais, se desejar
+    try {
+      const clientMetrics = await ClientService.getClientMetrics();
+      io.emit("client-metrics", clientMetrics);
+      console.log("Metrics emitted:", clientMetrics);
+    } catch (err) {
+      console.error("Erro ao emitir métricas via Socket.io:", err);
     }
   } catch (error) {
     console.error("Erro ao processar CSV:", error);
