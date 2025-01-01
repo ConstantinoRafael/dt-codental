@@ -85,7 +85,11 @@ class ClientController {
     try {
       const file = req.file;
       if (!file || !file.buffer) {
+<<<<<<< HEAD
         res.status(400).send("No file uploaded");
+=======
+        return res.status(400).send("No file uploaded");
+>>>>>>> 71a73923fc066ecb47d581e37f1eb85b99fe0357
       }
 
       // Adiciona um job na fila
