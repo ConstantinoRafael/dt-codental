@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Button, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Add, Upload, ArrowBack } from "@mui/icons-material"; // Importando a seta
 import apiClient from "@/utils/apiClient";
 import ClientesTable from "@/components/clients/ClientsTable";
@@ -21,10 +29,12 @@ const ClientesPage: React.FC = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isCsvModalOpen, setIsCsvModalOpen] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchType, setSearchType] = useState<string>("name");
 
   const router = useRouter(); // Para navegação
 
-  const fetchClients = async () => {
+  const fetchClients = async (searchTerm?: string, searchType?: string) => {
     try {
       const token = localStorage.getItem("token");
 
@@ -41,8 +51,12 @@ const ClientesPage: React.FC = () => {
           limit: rowsPerPage,
           sortBy: orderBy,
           order: order,
+          cpf: searchType === "cpf" ? searchTerm : undefined,
+          nome: searchType === "name" ? searchTerm : undefined,
+          telefone: searchType === "phone" ? searchTerm : undefined,
         },
       });
+      console.log(response.data.clients);
 
       setClients(response.data.clients);
       setTotalCount(response.data.totalCount);
@@ -52,7 +66,7 @@ const ClientesPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchClients();
+    fetchClients(searchTerm, searchType);
   }, [page, rowsPerPage, orderBy, order]);
 
   const handleOpenModal = () => setIsModalOpen(true);
@@ -113,6 +127,33 @@ const ClientesPage: React.FC = () => {
             Upload CSV
           </Button>
         </Box>
+      </Box>
+
+      <Box display="flex" alignItems="center" mt={2} mb={2} gap={2}>
+        <Select
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value as string)}
+          size="small"
+        >
+          <MenuItem value="name">Nome</MenuItem>
+          <MenuItem value="cpf">CPF</MenuItem>
+          <MenuItem value="phone">Telefone</MenuItem>
+        </Select>
+
+        <TextField
+          label={`Buscar por ${searchType === "name" ? "nome" : searchType}`}
+          variant="outlined"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          size="small"
+        />
+
+        <Button
+          variant="contained"
+          onClick={() => fetchClients(searchTerm, searchType)}
+        >
+          Buscar
+        </Button>
       </Box>
 
       {clients.length === 0 ? (
