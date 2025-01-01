@@ -28,9 +28,11 @@ export async function processCsvJob(data: FileData) {
     const jsonArray = await csv().fromString(csvString);
 
     const total = jsonArray.length;
-    const BATCH_SIZE = 100; // ajuste conforme necessidade
-
     const errors: any[] = [];
+
+    // Para controlar o tempo de emissão
+    let lastEmitTime = Date.now();
+    const EMIT_INTERVAL = 2000; // 2 segundos (2000 ms)
 
     for (let i = 0; i < total; i++) {
       const clientData = jsonArray[i];
@@ -41,7 +43,6 @@ export async function processCsvJob(data: FileData) {
           convert: false,
         });
 
-        // Verifica se CPF já existe
         const cpfExists = await ClientRepository.getByCPF(validateClient.CPF);
         if (cpfExists) {
           errors.push({
@@ -64,30 +65,31 @@ export async function processCsvJob(data: FileData) {
         });
       }
 
-      // --- Emissão de progresso a cada BATCH_SIZE registros
-      if ((i + 1) % BATCH_SIZE === 0) {
-        const io = getSocketIO();
+      // --- Emissão de progresso a cada X segundos
+      const now = Date.now();
+      if (now - lastEmitTime >= EMIT_INTERVAL) {
         const progress = Math.round(((i + 1) / total) * 100);
-
+        const io = getSocketIO();
         io.emit("csv-progress", {
           processed: i + 1,
           total,
-          progress, // em %
+          progress,
         });
 
         console.log(
           `Emitted partial progress: ${i + 1} / ${total} (${progress}%)`
         );
+
+        lastEmitTime = now; // atualiza o "último emit"
       }
     }
 
-    // Se ainda não tiver batido exato no batch, podemos emitir ao final
+    // Emissão final (garantir 100%)
     const io = getSocketIO();
-    const finalProgress = 100;
     io.emit("csv-progress", {
       processed: total,
       total,
-      progress: finalProgress,
+      progress: 100,
     });
     console.log(`Emitted final progress: ${total} / ${total} (100%)`);
 
