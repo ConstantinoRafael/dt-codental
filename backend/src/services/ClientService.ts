@@ -39,6 +39,7 @@ class ClientService {
   // }
 
   async saveClientsFromCSV(buffer: Buffer): Promise<void> {
+    console.log(buffer);
     const jsonArray = await csv().fromString(buffer.toString());
 
     const errors = [];
