@@ -1,42 +1,65 @@
-services:
-  # node:
-  #   container_name: node
-  #   build: ./back-end
-  #   ports:
-  #     - 5000:5000
-  #   env_file:
-  #     - ./back-end/.env
-  #   depends_on:
-  #     - postgres
+version: "3.8"
 
+services:
+  # Serviço do banco de dados
   postgres:
-    image: postgres
-    container_name: postgres
+    image: postgres:16-alpine
+    container_name: codental-postgres
     restart: always
-    ports:
-      - 5433:5432
     env_file:
       - ./backend/.env
+    ports:
+      - "5433:5432"
     volumes:
       - postgres-volume:/var/lib/postgresql/data
 
-  # react:
-  #   container_name: react
-  #   build: ./front-end
-  #   volumes:
-  #     - react-volume:/var/www/html
+  # Serviço do Redis
+  redis:
+    image: redis:6-alpine
+    container_name: codental-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    env_file:
+      - ./backend/.env
 
-  # nginx:
-  #   container_name: nginx_container
-  #   build: ./nginx
-  #   ports:
-  #     - 80:80
-  #   volumes:
-  #     - react-volume:/var/www/html
-  #   depends_on:
-  #     - node
-  #     - react
+  # Serviço do Backend
+  backend:
+    build:
+      context: ./backend
+    container_name: codental-backend
+    ports:
+      - "5001:5000"
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/usr/src/app:delegated
+      - /usr/src/app/node_modules
 
+    # Se precisar rodar migracoes/init-db automaticamente, pode fazer aqui
+    # command: sh -c "npm run init-db && npm run dev"
+
+  # Serviço do Frontend
+  frontend:
+    build:
+      context: ./frontend
+    container_name: codental-frontend
+
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env
+    volumes:
+      - ./frontend-volume:/app
+      - ./frontend:/usr/src/app:delegated
+      - /usr/src/app/node_modules
+
+# Declara volumes (para persistência do Postgres)
 volumes:
   postgres-volume:
-  # react-volume:
+  frontend-volume:
