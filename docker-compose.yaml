@@ -43,7 +43,7 @@ services:
       - codental-network
 
     # Se precisar rodar migracoes/init-db automaticamente, pode fazer aqui
-    # command: sh -c "npm run init-db && npm run dev"
+    command: sh -c "npm run init-db && npm run dev"
 
   # Serviço do Frontend
   frontend:
