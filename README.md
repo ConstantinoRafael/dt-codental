@@ -10,6 +10,8 @@ Este projeto implementa um sistema de gerenciamento e exibição de dados de cli
 - **Autenticação:** [JWT](https://jwt.io)
 - **Biblioteca de Componentes:** [Material-UI](https://mui.com)
 - **Atualização em Tempo Real:** [Socket.IO](https://socket.io)
+- **Processamento em Background:** [BullMQ](https://docs.bullmq.io) com [Redis](https://redis.io)
+- **Contêineres:** [Docker](https://www.docker.com) com [Docker Compose](https://docs.docker.com/compose/)
 
 ---
 
@@ -29,6 +31,8 @@ Este projeto implementa um sistema de gerenciamento e exibição de dados de cli
   - Telefones no formato `(XX) XXXX-XXXX` ou `(XX) XXXXX-XXXX`.
   - CPFs no formato `XXX.XXX.XXX-XX`.
   - Evita duplicidade de CPF no banco de dados.
+- **Processamento assíncrono:**
+  - O processamento dos arquivos CSV utiliza BullMQ e Redis para filas de trabalho, permitindo escalabilidade e maior performance.
 
 #### **Formulário de Inclusão Manual**
 
@@ -64,6 +68,8 @@ Este projeto implementa um sistema de gerenciamento e exibição de dados de cli
 
 ## 📦 Como Rodar o Projeto Localmente
 
+### Usando Docker Compose
+
 1. Clone o repositório:
 
    ```bash
@@ -71,7 +77,25 @@ Este projeto implementa um sistema de gerenciamento e exibição de dados de cli
    cd dt-codental
    ```
 
-2. Instale as dependências:
+2. Configure as variáveis de ambiente:
+
+   - No diretório `backend` crie o arquivo `.env` com base no `.env.example`;
+   - No diretório `frontend` crie o arquivo `.env` com base no `.env.example` (e com base no `.env` do `backend`);
+
+3. Execute o Docker Compose:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+4. Acesse o sistema:
+
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend: [http://localhost:5000](http://localhost:5000)
+
+### Rodando Manualmente
+
+1. Instale as dependências:
 
    ```bash
    #backend
@@ -83,12 +107,20 @@ Este projeto implementa um sistema de gerenciamento e exibição de dados de cli
    npm install
    ```
 
-3. Crie um banco de dados PostgreSQL com qualquer nome.
+2. Crie um banco de dados PostgreSQL com qualquer nome.
 
-4. Configure as variáveis de ambiente:
+3. Configure as variáveis de ambiente:
 
    - No diretório `backend` crie o arquivo `.env` com base no `.env.example`;
    - No diretório `frontend` crie o arquivo `.env` com base no `.env.example` (e com base no `.env` do `backend`);
+
+4. Certifique-se de que o Redis está rodando:
+
+   - Execute um contêiner Redis com o comando:
+     ```bash
+     docker run -d --name redis -p 6379:6379 redis
+     ```
+   - Ou inicie o serviço Redis localmente, caso já esteja instalado.
 
 5. Crie as tabelas no banco de dados:
 
@@ -108,8 +140,10 @@ Este projeto implementa um sistema de gerenciamento e exibição de dados de cli
 
    #frontend
    cd ../frontend
-   npm run dev6
+   npm run dev
    ```
+
+---
 
 ## 🌍 Acesso ao Sistema em Produção
 
@@ -117,3 +151,5 @@ Acesse: https://dt-codental.vercel.app/
 
 - login: admin@codental.com
 - senha: admin123
+
+---
