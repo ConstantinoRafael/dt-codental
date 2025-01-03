@@ -12,6 +12,8 @@ services:
       - "5433:5432"
     volumes:
       - postgres-volume:/var/lib/postgresql/data
+    networks:
+      - codental-network
 
   # Serviço do Redis
   redis:
@@ -22,6 +24,8 @@ services:
       - "6379:6379"
     env_file:
       - ./backend/.env
+    networks:
+      - codental-network
 
   # Serviço do Backend
   backend:
@@ -29,15 +33,14 @@ services:
       context: ./backend
     container_name: codental-backend
     ports:
-      - "5001:5000"
+      - "5000:5000"
     depends_on:
       - postgres
       - redis
     env_file:
       - ./backend/.env
-    volumes:
-      - ./backend:/usr/src/app:delegated
-      - /usr/src/app/node_modules
+    networks:
+      - codental-network
 
     # Se precisar rodar migracoes/init-db automaticamente, pode fazer aqui
     # command: sh -c "npm run init-db && npm run dev"
@@ -49,17 +52,21 @@ services:
     container_name: codental-frontend
 
     ports:
-      - "3001:3000"
+      - "3000:3000"
     depends_on:
       - backend
     env_file:
       - ./frontend/.env
-    volumes:
-      - ./frontend-volume:/app
-      - ./frontend:/usr/src/app:delegated
-      - /usr/src/app/node_modules
+    # volumes:
+    #   - ./frontend-volume:/app
+    networks:
+      - codental-network
 
 # Declara volumes (para persistência do Postgres)
 volumes:
   postgres-volume:
   frontend-volume:
+
+networks:
+  codental-network:
+    driver: bridge
