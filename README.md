@@ -1,101 +1,101 @@
-# Desafio Técnico - Desenvolvedor Codental
+# Technical Challenge - Codental Developer
 
-Este projeto implementa um sistema de gerenciamento e exibição de dados de clientes e compromissos.
+This project implements a management and display system for clients and appointments data.
 
-## 🚀 Tecnologias Utilizadas
+## 🚀 Technologies Used
 
-- **Backend:** [Node.js](https://nodejs.org) com [Express](https://expressjs.com)
-- **Frontend:** [React.js](https://reactjs.org) com [Next.js](https://nextjs.org)
-- **Banco de Dados:** [PostgreSQL](https://www.postgresql.org)
-- **Autenticação:** [JWT](https://jwt.io)
-- **Biblioteca de Componentes:** [Material-UI](https://mui.com)
-- **Atualização em Tempo Real:** [Socket.IO](https://socket.io)
-- **Processamento em Background:** [BullMQ](https://docs.bullmq.io) com [Redis](https://redis.io)
-- **Contêineres:** [Docker](https://www.docker.com) com [Docker Compose](https://docs.docker.com/compose/)
-
----
-
-## 📖 Funcionalidades
-
-### 🛠 Parte Administrativa (Painel)
-
-#### **Acesso ao Painel**
-
-- Autenticação via e-mail e senha protegida com JWT.
-
-#### **Importação de CSV**
-
-- Upload de arquivos `clientes.csv` com normalização dos dados:
-  - Nomes capitalizados.
-  - Endereços divididos em campos separados.
-  - Telefones no formato `(XX) XXXX-XXXX` ou `(XX) XXXXX-XXXX`.
-  - CPFs no formato `XXX.XXX.XXX-XX`.
-  - Evita duplicidade de CPF no banco de dados.
-- **Processamento assíncrono:**
-  - O processamento dos arquivos CSV utiliza BullMQ e Redis para filas de trabalho, permitindo escalabilidade e maior performance.
-
-#### **Formulário de Inclusão Manual**
-
-- Permite cadastrar clientes manualmente.
-- Validações:
-  - Campos obrigatórios: Nome, Endereço, Cidade, Estado, CEP, Telefone e CPF.
-  - Evita duplicidade de CPF.
-
-#### **Listagem de Clientes**
-
-- Tabela com busca, paginação e ordenação.
-  - Busca por CPF, Nome ou Telefone.
-  - Ordenação por Nome, Estado ou Data de Cadastro.
-
-#### **Compromissos**
-
-- Cadastro de compromissos com Nome, Data de Início e Fim.
-  - Validação de conflitos de horário.
-  - Tabela de compromissos com listagem completa.
+- **Backend:** [Node.js](https://nodejs.org) with [Express](https://expressjs.com)
+- **Frontend:** [React.js](https://reactjs.org) with [Next.js](https://nextjs.org)
+- **Database:** [PostgreSQL](https://www.postgresql.org)
+- **Authentication:** [JWT](https://jwt.io)
+- **Component Library:** [Material-UI](https://mui.com)
+- **Real-Time Updates:** [Socket.IO](https://socket.io)
+- **Background Processing:** [BullMQ](https://docs.bullmq.io) with [Redis](https://redis.io)
+- **Containers:** [Docker](https://www.docker.com) with [Docker Compose](https://docs.docker.com/compose/)
 
 ---
 
-### 🌐 Parte Externa (Pública)
+## 📖 Features
 
-#### **Exibição Dinâmica**
+### 🛠 Administrative Section (Dashboard)
 
-- Quantidade total de clientes cadastrados.
-- Quantidade de clientes com telefones duplicados.
-- Quantidade de clientes por estado.
-- Atualização em tempo real via WebSocket.
+#### **Dashboard Access**
+
+- Authentication via email and password secured with JWT.
+
+#### **CSV Import**
+
+- Upload `clientes.csv` files with data normalization:
+  - Capitalized names.
+  - Addresses split into separate fields.
+  - Phone numbers formatted as `(XX) XXXX-XXXX` or `(XX) XXXXX-XXXX`.
+  - CPF numbers formatted as `XXX.XXX.XXX-XX`.
+  - Prevents duplicate CPF entries in the database.
+- **Asynchronous Processing:**
+  - CSV file processing uses BullMQ and Redis for job queues, enabling scalability and improved performance.
+
+#### **Manual Entry Form**
+
+- Allows manual client registration.
+- Validations:
+  - Mandatory fields: Name, Address, City, State, ZIP, Phone, and CPF.
+  - Prevents duplicate CPF entries.
+
+#### **Client Listing**
+
+- Table with search, pagination, and sorting.
+  - Search by CPF, Name, or Phone.
+  - Sort by Name, State, or Registration Date.
+
+#### **Appointments**
+
+- Register appointments with Name, Start Date, and End Date.
+  - Validates schedule conflicts.
+  - Appointments table with full listing.
 
 ---
 
-## 📦 Como Rodar o Projeto Localmente
+### 🌐 External Section (Public)
 
-### Usando Docker Compose
+#### **Dynamic Display**
 
-1. Clone o repositório:
+- Total number of registered clients.
+- Number of clients with duplicate phone numbers.
+- Number of clients by state.
+- Real-time updates via WebSocket.
+
+---
+
+## 📦 How to Run the Project Locally
+
+### Using Docker Compose
+
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/ConstantinoRafael/dt-codental.git
    cd dt-codental
    ```
 
-2. Configure as variáveis de ambiente:
+2. Configure the environment variables:
 
-   - No diretório `backend` crie o arquivo `.env` com base no `.env.example`;
-   - No diretório `frontend` crie o arquivo `.env` com base no `.env.example` (e com base no `.env` do `backend`);
+   - In the `backend` directory, create the `.env` file based on `.env.example`;
+   - In the `frontend` directory, create the `.env` file based on `.env.example` (and based on the `backend` `.env`).
 
-3. Execute o Docker Compose:
+3. Run Docker Compose:
 
    ```bash
    docker compose up -d --build
    ```
 
-4. Acesse o sistema:
+4. Access the system:
 
    - Frontend: [http://localhost:3000](http://localhost:3000)
    - Backend: [http://localhost:5000](http://localhost:5000)
 
-### Rodando Manualmente
+### Running Manually
 
-1. Instale as dependências:
+1. Install dependencies:
 
    ```bash
    #backend
@@ -107,31 +107,31 @@ Este projeto implementa um sistema de gerenciamento e exibição de dados de cli
    npm install
    ```
 
-2. Crie um banco de dados PostgreSQL com qualquer nome.
+2. Create a PostgreSQL database with any name.
 
-3. Configure as variáveis de ambiente:
+3. Configure the environment variables:
 
-   - No diretório `backend` crie o arquivo `.env` com base no `.env.example`;
-   - No diretório `frontend` crie o arquivo `.env` com base no `.env.example` (e com base no `.env` do `backend`);
+   - In the `backend` directory, create the `.env` file based on `.env.example`;
+   - In the `frontend` directory, create the `.env` file based on `.env.example` (and based on the `backend` `.env`).
 
-4. Certifique-se de que o Redis está rodando:
+4. Ensure Redis is running:
 
-   - Execute um contêiner Redis com o comando:
+   - Run a Redis container with the command:
      ```bash
      docker run -d --name redis -p 6379:6379 redis
      ```
-   - Ou inicie o serviço Redis localmente, caso já esteja instalado.
+   - Or start Redis service locally, if already installed.
 
-5. Crie as tabelas no banco de dados:
+5. Create the database tables:
 
    ```bash
    cd ../backend
    npm run init-db
    ```
 
-   (esse script também criará o usuário para acessar a parte administrativa da aplicação)
+   (this script will also create the user to access the administrative section of the application)
 
-6. Inicie o projeto:
+6. Start the project:
 
    ```bash
    #backend
@@ -145,11 +145,11 @@ Este projeto implementa um sistema de gerenciamento e exibição de dados de cli
 
 ---
 
-## 🌍 Acesso ao Sistema em Produção
+## 🌍 Accessing the System in Production
 
-Acesse: https://dt-codental.vercel.app/
+Access: https://dt-codental.vercel.app/
 
 - login: admin@codental.com
-- senha: admin123
+- password: admin123
 
 ---
